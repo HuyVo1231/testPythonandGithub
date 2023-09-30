@@ -138,6 +138,43 @@ def play_youtube():
     speak("Chúc bạn nghe vui vẻ")
 
 
+# ffc5594b7ccc13d615d1236fe7babddc
+# https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+# Xem thời tiết
+def weather():
+    speak("Bạn muốn xem thời tiết ở nơi nào?")
+    url = "https://api.openweathermap.org/data/2.5/weather?"
+    city = get_text()
+    if not city:
+        pass
+    api_key = "ffc5594b7ccc13d615d1236fe7babddc"
+    call_url = url + "appid=" + api_key + "&q=" + city + "&units=metric"
+    response = requests.get(call_url)
+    data = response.json()
+    name = city
+    if data["cod"] != "404":
+        city_res = data["main"]
+        current_temp = city_res["temp"]
+        current_pressure = city_res["pressure"]
+        current_humidity = city_res["humidity"]
+        suntime = data["sys"]
+        sunrise = datetime.datetime.fromtimestamp(suntime["sunrise"])
+        sunset = datetime.datetime.fromtimestamp(suntime["sunset"])
+        wt = data["weather"]
+        weather_des = wt[0]["description"]
+        now = datetime.datetime.now()
+        content = f""" Hôm nay là ngày {now.day} tháng {now.month} năm {now.year} tại {name}.
+          Mặt trời mọc ở vào lúc {sunrise.hour} giờ
+        {sunrise.minute} phút. Mặt trời lặn vào lúc {sunset.hour} giờ {sunset.minute} phút. 
+        Nhiệt độ trung bình là {current_temp} độ C
+        Áp suất không khí là {current_pressure} héc tơ. Độ ẩm {current_humidity}%.
+        """
+        speak(content)
+        time.sleep(25)
+    else:
+        speak(f"Không tìm thấy {city}")
+
+
 # gọi trợ lý ảo
 def call():
     speak("Xin chào. Bạn tên gì?")
@@ -161,9 +198,11 @@ def call():
                 get_time(text)
             elif "bài hát" in text:
                 play_youtube()
+            elif "thời tiết" in text:
+                weather()
             elif "dừng" in text or "tạm biệt" in text:
                 stop()
-                time.sleep(5)
+                time.sleep(3)
                 break
 
 
