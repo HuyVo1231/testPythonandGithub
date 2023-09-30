@@ -64,6 +64,7 @@ def get_text():
         if text:
             return text.lower()
         elif i < 2:
+            time.sleep(2)
             speak("Bot không nghe rõ. Bạn nói lại được không!")
     time.sleep(5)
     stop()
@@ -81,7 +82,7 @@ def talk(name):
         speak("Chào buổi chiều {}. Chúc bạn buổi chiều vui vẻ!".format(name))
     else:
         speak("Chào buổi tối {}. Chúc bạn buổi tối vui vẻ".format(name))
-    time.sleep(5)
+    time.sleep(3)
     speak("Bạn có khỏe không?")
     time.sleep(3)
     ans = get_audio()
@@ -97,7 +98,7 @@ def open_webiste(text):
     regex = re.search("mở (.+)", text)  # re.search . Lấy tất cả phía sau từ "mở"
     if regex:
         domain = regex.group(1)
-        url = "https://www." + domain
+        url = "https://www." + domain + ".com"
         webbrowser.open(url)
         speak("Trang web bạn yêu cầu đang được mở.")
         return True
@@ -105,6 +106,7 @@ def open_webiste(text):
         return False
 
 
+# Tìm kiếm trên google.
 def open_google_and_search(text):
     search_for = text.split("kiếm", 1)[1]
     url = f"https://www.google.com/search?q={search_for}"
@@ -112,7 +114,28 @@ def open_google_and_search(text):
     webbrowser.open(url)
 
 
-open_google_and_search("tìm kiếm sơn tùng")
+# Lấy thời gian và giờ hiện tại.
+def get_time(text):
+    now = datetime.datetime.now()
+    if "giờ" in text:
+        speak("Bây giờ là %d giờ %d phút" % (now.hour, now.minute))
+    elif "ngày" in text:
+        speak("Hôn nay là ngày %d tháng %d năm %d" % (now.day, now.month, now.year))
+    else:
+        speak("Mình chưa hiểu...")
+
+
+# Phát youtube
+def play_youtube():
+    speak("Bạn muốn xem gì trên youtube?")
+    my_video = get_text()
+    while True:
+        result = YoutubeSearch(my_video, max_results=10).to_dict()
+        if result:
+            break
+    url = "https://www.youtube.com" + result[0]["url_suffix"]
+    webbrowser.open(url)
+    speak("Chúc bạn nghe vui vẻ")
 
 
 # gọi trợ lý ảo
@@ -122,7 +145,7 @@ def call():
     time.sleep(2)
     if name:
         speak("Xin chào {}".format(name))
-        time.sleep(3)
+        time.sleep(2)
         speak("Bạn cần mình làm gì ạ?")
         while True:
             text = get_text()
@@ -134,7 +157,11 @@ def call():
                 open_webiste(text)
             elif "tìm" in text:
                 open_google_and_search(text)
-            elif "dừng" in text or "thôi" in text:
+            elif "ngày" in text or "giờ" in text:
+                get_time(text)
+            elif "bài hát" in text:
+                play_youtube()
+            elif "dừng" in text or "tạm biệt" in text:
                 stop()
                 time.sleep(5)
                 break
