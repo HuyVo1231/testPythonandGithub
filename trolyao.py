@@ -85,7 +85,6 @@ def talk(name):
         speak("Chào buổi tối {}. Chúc bạn buổi tối vui vẻ".format(name))
     time.sleep(3)
     speak("Bạn có khỏe không?")
-    time.sleep(3)
     ans = get_audio()
     if ans:
         if "có" in ans or "không" not in ans:
@@ -212,18 +211,19 @@ def change_wallpaper():
 # Đọc định nghĩa trên wiki
 def tell_me_about():
     try:
-        speak("Bạn muốn nghe về gì ạ")
+        speak("Bạn muốn nghe về vấn đề gì?")
         text = get_text()
         contents = wikipedia.summary(text).split("\n")
         speak(contents[0])
-        time.sleep(20)
+        time.sleep(30)
         for content in contents[1:]:
             speak("Bạn muốn nghe thêm không")
             ans = get_text()
             if "có" not in ans:
                 break
             speak(content)
-            time.sleep(20)
+            time.sleep(15)
+
         speak("Cảm ơn bạn đã lắng nghe!!!")
     except:
         speak("Bot không định nghĩa được thuật ngữ của bạn. Xin mời bạn nói lại")
@@ -232,10 +232,10 @@ def tell_me_about():
 # gửi email
 def send_email():
     speak("Bạn gửi email cho ai nhỉ")
-    recipient = "hoang yến"
-    if "yến" in recipient:
+    recipient = get_text()
+    if "huy" in recipient:
         speak("Nội dung bạn muốn gửi là gì")
-        content = "test"
+        content = get_text()
         mail = smtplib.SMTP("smtp.gmail.com", 587)
         mail.ehlo()
         mail.starttls()
@@ -244,9 +244,30 @@ def send_email():
             "vnhathuy1306@gmail.com", "vonhathuy1306@gmail.com", content.encode("utf-8")
         )
         mail.close()
-        speak("Email của bạn vùa được gửi. Bạn check lại email nhé hihi.")
+        speak("Email bạn yêu cầu đã được gửi. Bạn có thể kiểm tra lại!!")
     else:
         speak("Bot không hiểu bạn muốn gửi email cho ai. Bạn nói lại được không?")
+
+
+# Đọc báo
+def read_news():
+    speak("Bạn muốn đọc báo về gì")
+
+    queue = get_text()
+    params = {
+        "apiKey": "e4e9a2872d594a0cacb81bd4f180d74e",
+        "q": queue,
+    }
+    api_result = requests.get("http://newsapi.org/v2/top-headlines?", params)
+    api_response = api_result.json()
+    print("Tin tức")
+    for number, result in enumerate(api_response["articles"], start=1):
+        print(
+            f"""Tin {number}:\nTiêu đề: {result['title']}\nTrích dẫn: {result['description']}\nLink: {result['url']}
+    """
+        )
+        if number <= 3:
+            webbrowser.open(result["url"])
 
 
 # gọi trợ lý ảo
@@ -280,7 +301,9 @@ def call():
             elif "hình nền" in text:
                 change_wallpaper()
             elif "định nghĩa" in text:
-                change_wallpaper()
+                tell_me_about()
+            elif "đọc báo" in text:
+                read_news()
             elif "email" in text or "gmail" in text or "mail" in text:
                 send_email()
             elif "dừng" in text or "tạm biệt" in text:
