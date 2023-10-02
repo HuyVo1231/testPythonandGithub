@@ -26,6 +26,7 @@ from youtube_search import YoutubeSearch
 
 language = "vi"
 path = ChromeDriverManager().install()
+wikipedia.set_lang("vi")
 
 
 # Văn bản thành âm thanh
@@ -208,6 +209,46 @@ def change_wallpaper():
     time.sleep(3)
 
 
+# Đọc định nghĩa trên wiki
+def tell_me_about():
+    try:
+        speak("Bạn muốn nghe về gì ạ")
+        text = get_text()
+        contents = wikipedia.summary(text).split("\n")
+        speak(contents[0])
+        time.sleep(20)
+        for content in contents[1:]:
+            speak("Bạn muốn nghe thêm không")
+            ans = get_text()
+            if "có" not in ans:
+                break
+            speak(content)
+            time.sleep(20)
+        speak("Cảm ơn bạn đã lắng nghe!!!")
+    except:
+        speak("Bot không định nghĩa được thuật ngữ của bạn. Xin mời bạn nói lại")
+
+
+# gửi email
+def send_email():
+    speak("Bạn gửi email cho ai nhỉ")
+    recipient = "hoang yến"
+    if "yến" in recipient:
+        speak("Nội dung bạn muốn gửi là gì")
+        content = "test"
+        mail = smtplib.SMTP("smtp.gmail.com", 587)
+        mail.ehlo()
+        mail.starttls()
+        mail.login("vnhathuy1306@gmail.com", "lfdoatbdgeyfyuxa")
+        mail.sendmail(
+            "vnhathuy1306@gmail.com", "vonhathuy1306@gmail.com", content.encode("utf-8")
+        )
+        mail.close()
+        speak("Email của bạn vùa được gửi. Bạn check lại email nhé hihi.")
+    else:
+        speak("Bot không hiểu bạn muốn gửi email cho ai. Bạn nói lại được không?")
+
+
 # gọi trợ lý ảo
 def call():
     speak("Xin chào. Bạn tên gì?")
@@ -238,6 +279,10 @@ def call():
                 weather()
             elif "hình nền" in text:
                 change_wallpaper()
+            elif "định nghĩa" in text:
+                change_wallpaper()
+            elif "email" in text or "gmail" in text or "mail" in text:
+                send_email()
             elif "dừng" in text or "tạm biệt" in text:
                 stop()
                 time.sleep(3)
