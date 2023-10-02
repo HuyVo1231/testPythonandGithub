@@ -98,7 +98,7 @@ def open_webiste(text):
     regex = re.search("mở (.+)", text)  # re.search . Lấy tất cả phía sau từ "mở"
     if regex:
         domain = regex.group(1)
-        url = "https://www." + domain + ".com"
+        url = "https://www." + domain
         webbrowser.open(url)
         speak("Trang web bạn yêu cầu đang được mở.")
         return True
@@ -138,8 +138,6 @@ def play_youtube():
     speak("Chúc bạn nghe vui vẻ")
 
 
-# ffc5594b7ccc13d615d1236fe7babddc
-# https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
 # Xem thời tiết
 def weather():
     speak("Bạn muốn xem thời tiết ở nơi nào?")
@@ -148,8 +146,8 @@ def weather():
     if not city:
         pass
     api_key = "ffc5594b7ccc13d615d1236fe7babddc"
-    call_url = url + "appid=" + api_key + "&q=" + city + "&units=metric"
-    response = requests.get(call_url)
+    call_url = url + "appid=" + api_key + "&q=" + city + "&units=metric" + "&lang=vi"
+    response = requests.get(call_url)  # Duyệt web ẩn ko cần vào trang web.
     data = response.json()
     name = city
     if data["cod"] != "404":
@@ -167,12 +165,47 @@ def weather():
           Mặt trời mọc ở vào lúc {sunrise.hour} giờ
         {sunrise.minute} phút. Mặt trời lặn vào lúc {sunset.hour} giờ {sunset.minute} phút. 
         Nhiệt độ trung bình là {current_temp} độ C
-        Áp suất không khí là {current_pressure} héc tơ. Độ ẩm {current_humidity}%.
+        Áp suất không khí là {current_pressure} héc tơ. Độ ẩm {current_humidity}%. Ngoài trời đang {weather_des}.
         """
         speak(content)
-        time.sleep(25)
+        time.sleep(28)
     else:
         speak(f"Không tìm thấy {city}")
+
+
+# Mở ứng dụng
+def open_application(text):
+    if "google" in text:
+        speak("Mở Google Chrome")
+        os.startfile("C:\Program Files\Google\Chrome\Application\chrome.exe")
+    elif "word" in text:
+        speak("Mở Microsoft Word")
+        os.startfile("C:\Program Files\Microsoft Office\\root\Office16\\WINWORD.EXE")
+    elif "excel" in text:
+        speak("Mở Microsoft Excel")
+        os.startfile("C:\Program Files\Microsoft Office\\root\Office16\EXCEL.EXE")
+    elif "powerpoint" in text:
+        speak("Mở Microsoft Powerpoint")
+        os.startfile("C:\Program Files\Microsoft Office\\root\Office16\POWERPNT.EXE")
+    else:
+        speak("Ứng dụng chưa được cài đặt. Bạn hãy thử lại!")
+
+
+# Đổi hình nền
+# -Qy6jOB9Q_H3CkFMpH1jc28vem8dw00WcItzTQmw3HY -- API KEYS
+def change_wallpaper():
+    api_key = "-Qy6jOB9Q_H3CkFMpH1jc28vem8dw00WcItzTQmw3HY"
+    url = "https://api.unsplash.com/photos/random?client_id=" + api_key
+    f = urllib2.urlopen(url)  # Duyệt web không cần giao diện.
+    json_string = f.read()
+    f.close()
+    parsed_json = json.loads(json_string)
+    photo = parsed_json["urls"]["full"]
+    urllib2.urlretrieve(photo, "C:/Users/FPTSHOP/Downloads/image_change.png")
+    image = os.path.join("C:/Users/FPTSHOP/Downloads/image_change.png")
+    ctypes.windll.user32.SystemParametersInfoW(20, 0, image, 3)
+    speak("Hình nền đã được thay đổi")
+    time.sleep(3)
 
 
 # gọi trợ lý ảo
@@ -191,15 +224,20 @@ def call():
             elif "trò chuyện" in text or "nói chuyện" in text:
                 talk(name)
             elif "mở" in text:
-                open_webiste(text)
-            elif "tìm" in text:
-                open_google_and_search(text)
+                if "google và tìm kiếm" in text:
+                    open_google_and_search(text)
+                elif "." in text:
+                    open_webiste(text)
+                elif "bài hát" in text:
+                    play_youtube()
+                else:
+                    open_application(text)
             elif "ngày" in text or "giờ" in text:
                 get_time(text)
-            elif "bài hát" in text:
-                play_youtube()
             elif "thời tiết" in text:
                 weather()
+            elif "hình nền" in text:
+                change_wallpaper()
             elif "dừng" in text or "tạm biệt" in text:
                 stop()
                 time.sleep(3)
