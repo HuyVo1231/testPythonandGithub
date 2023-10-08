@@ -65,9 +65,9 @@ def get_text():
         if text:
             return text.lower()
         elif i < 2:
-            time.sleep(2)
+            time.sleep(3)
             speak("Bot không nghe rõ. Bạn nói lại được không!")
-    time.sleep(5)
+    time.sleep(10)
     stop()
     return 0
 
@@ -83,12 +83,12 @@ def talk(name):
         speak("Chào buổi chiều {}. Chúc bạn buổi chiều vui vẻ!".format(name))
     else:
         speak("Chào buổi tối {}. Chúc bạn buổi tối vui vẻ".format(name))
-    time.sleep(3)
+    time.sleep(5)
     speak("Bạn có khỏe không?")
     ans = get_audio()
     if ans:
         if "có" in ans or "không" not in ans:
-            speak("Thật là tốt")
+            speak("Tôi cũng khỏe giống bạn")
         else:
             speak("Hãy giữ gìn sức khỏe nhé")
 
@@ -127,7 +127,7 @@ def get_time(text):
 
 # Phát youtube
 def play_youtube():
-    speak("Bạn muốn xem gì trên youtube?")
+    speak("Bạn muốn nghe nhạc gì trên youtube?")
     my_video = get_text()
     while True:
         result = YoutubeSearch(my_video, max_results=10).to_dict()
@@ -222,7 +222,7 @@ def tell_me_about():
             if "có" not in ans:
                 break
             speak(content)
-            time.sleep(15)
+            time.sleep(20)
 
         speak("Cảm ơn bạn đã lắng nghe!!!")
     except:
@@ -245,6 +245,7 @@ def send_email():
         )
         mail.close()
         speak("Email bạn yêu cầu đã được gửi. Bạn có thể kiểm tra lại!!")
+        time.sleep(3)
     else:
         speak("Bot không hiểu bạn muốn gửi email cho ai. Bạn nói lại được không?")
 
@@ -252,7 +253,6 @@ def send_email():
 # Đọc báo
 def read_news():
     speak("Bạn muốn đọc báo về gì")
-
     queue = get_text()
     params = {
         "apiKey": "e4e9a2872d594a0cacb81bd4f180d74e",
@@ -270,6 +270,22 @@ def read_news():
             webbrowser.open(result["url"])
 
 
+def help_me():
+    speak(
+        """Bot có thể giúp bạn thực hiện các câu lệnh sau đây:
+    1. Chào hỏi
+    2. Hiển thị giờ
+    3. Mở website, ứng dụng
+    4. Tìm kiếm trên Google
+    5. Gửi email
+    6. Dự báo thời tiết
+    7. Mở video nhạc
+    8. Thay đổi hình nền máy tính
+    9. Đọc báo hôm nay
+    10. Tìm kiếm định nghĩa trên wikipedia """
+    )
+
+
 # gọi trợ lý ảo
 def call():
     speak("Xin chào. Bạn tên gì?")
@@ -285,6 +301,12 @@ def call():
                 break
             elif "trò chuyện" in text or "nói chuyện" in text:
                 talk(name)
+            elif "email" in text or "gmail" in text or "mail" in text:
+                send_email()
+            elif "dừng" in text or "tạm biệt" in text:
+                stop()
+                time.sleep(4)
+                break
             elif "mở" in text:
                 if "google và tìm kiếm" in text:
                     open_google_and_search(text)
@@ -304,12 +326,8 @@ def call():
                 tell_me_about()
             elif "đọc báo" in text:
                 read_news()
-            elif "email" in text or "gmail" in text or "mail" in text:
-                send_email()
-            elif "dừng" in text or "tạm biệt" in text:
-                stop()
-                time.sleep(3)
-                break
+            elif "có thể làm gì" in text or "làm được gì" in text:
+                help_me()
 
 
 call()
